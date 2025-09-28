@@ -1,2 +1,3 @@
-# Pokemon-League-Creator-Simulator
-based on pokemon-showdown
+# Pokemon-League Creator & Simulator
+a fun project by Leon Broda
+simulation based on pokemon-showdown
