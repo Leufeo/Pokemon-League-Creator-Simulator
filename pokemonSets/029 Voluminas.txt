@@ -1,9 +1,0 @@
-Voluminas (Probopass)  
-Ability: Magnet Pull  
-Tera Type: Rock  
-EVs: 194 HP / 31 Atk / 93 Def  
-IVs: 19 HP / 2 Atk / 10 Def / 4 SpA / 27 SpD  
-- Rock Slide  
-- Rock Smash  
-- Power Gem  
-- Dazzling Gleam

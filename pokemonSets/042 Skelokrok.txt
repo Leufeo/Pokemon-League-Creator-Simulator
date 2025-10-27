@@ -1,9 +1,0 @@
-Skelokrok (Skeledirge) @ Maranga Berry  
-Ability: Unaware  
-Tera Type: Fire  
-EVs: 174 Atk / 137 Def / 138 SpD  
-IVs: 3 HP / 15 Atk / 18 Def / 1 SpA / 14 SpD / 4 Spe  
-- Imprison  
-- Endure  
-- Take Down  
-- Hyper Voice

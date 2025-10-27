@@ -1,9 +1,0 @@
-Rossana (Jynx)  
-Ability: Dry Skin  
-Tera Type: Ice  
-EVs: 71 Spe  
-IVs: 19 HP / 9 Atk / 1 Def / 6 SpA / 2 SpD / 6 Spe  
-- Psychic  
-- Rain Dance  
-- Light Screen  
-- Triple Axel

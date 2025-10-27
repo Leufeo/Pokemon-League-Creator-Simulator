@@ -1,9 +1,0 @@
-Wampitz (Bellibolt)  
-Ability: Static  
-Tera Type: Electric  
-EVs: 76 Def / 96 Spe  
-IVs: 27 HP / 20 SpA / 5 SpD / 1 Spe  
-- Soak  
-- Water Gun  
-- Spark  
-- Tackle
