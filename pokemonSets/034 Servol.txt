@@ -1,0 +1,10 @@
+Servol (Indeedee) (M)  
+Ability: Synchronize  
+Tera Type: Psychic  
+EVs: 223 SpD / 215 Spe  
+Docile Nature  
+IVs: 23 HP / 12 Atk / 2 Def / 12 SpA / 7 SpD / 23 Spe  
+- Drain Punch  
+- Endure  
+- Rest  
+- Psychic

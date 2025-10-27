@@ -1,0 +1,10 @@
+015 Laukaps (Karrablast) @ Aguav Berry  
+Ability: Shed Skin  
+Tera Type: Bug  
+EVs: 10 Atk / 248 Def / 250 SpA  
+Hasty Nature  
+IVs: 13 HP / 22 Atk / 16 Def / 19 SpA / 25 SpD / 14 Spe  
+- Headbutt  
+- Megahorn  
+- Sleep Talk  
+- Screech

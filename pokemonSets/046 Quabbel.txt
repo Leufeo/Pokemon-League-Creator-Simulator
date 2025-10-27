@@ -1,0 +1,10 @@
+Quabbel (Frillish)  
+Ability: Damp  
+Tera Type: Water  
+EVs: 215 Def / 221 SpA  
+Adamant Nature  
+IVs: 20 HP / 27 Atk / 19 Def / 26 SpA / 3 SpD / 27 Spe  
+- Destiny Bond  
+- Ice Beam  
+- Water Gun  
+- Substitute

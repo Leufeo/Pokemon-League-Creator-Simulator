@@ -1,0 +1,10 @@
+Togetic @ Fire Gem  
+Ability: Serene Grace  
+Tera Type: Fairy  
+EVs: 65 Atk / 11 Def / 123 SpA / 1 SpD / 36 Spe  
+Relaxed Nature  
+IVs: 18 HP / 5 Atk / 5 Def / 26 SpA / 14 SpD / 22 Spe  
+- Flamethrower  
+- Smart Strike  
+- Sunny Day  
+- Endure

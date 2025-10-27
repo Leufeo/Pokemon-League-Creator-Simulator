@@ -1,0 +1,10 @@
+001 Brimano (Hattrem) (F)  
+Ability: Magic Bounce  
+Tera Type: Psychic  
+EVs: 50 HP / 106 Atk / 160 Def / 56 SpA  
+Naive Nature  
+IVs: 15 HP / 28 Atk / 28 Def / 10 SpA / 7 SpD / 24 Spe  
+- Play Nice  
+- Facade  
+- Metronome  
+- Psychic

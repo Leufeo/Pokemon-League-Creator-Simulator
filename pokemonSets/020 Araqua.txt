@@ -1,0 +1,10 @@
+020 Araqua (Dewpider)  
+Ability: Water Bubble  
+Tera Type: Water  
+EVs: 33 Def / 27 Spe  
+Impish Nature  
+IVs: 10 HP / 18 Atk / 19 Def / 13 SpA / 5 SpD / 8 Spe  
+- Water Gun  
+- Stockpile  
+- Attract  
+- Crunch

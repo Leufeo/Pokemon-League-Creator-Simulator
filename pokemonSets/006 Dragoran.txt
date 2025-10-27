@@ -1,0 +1,11 @@
+006 Dragoran (Dragonite)  
+Ability: Multiscale  
+Shiny: Yes  
+Tera Type: Dragon  
+EVs: 38 SpA  
+Lonely Nature  
+IVs: 3 HP / 2 Atk / 6 Def / 5 SpA / 24 SpD / 13 Spe  
+- Air Slash  
+- Thunder Punch  
+- Sleep Talk  
+- Safeguard

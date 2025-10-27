@@ -1,0 +1,10 @@
+008 Georok (Graveler)  
+Ability: Rock Head  
+Tera Type: Rock  
+EVs: 14 HP / 147 Def / 39 SpA  
+Brave Nature  
+IVs: 17 HP / 3 Atk / 12 Def / 15 SpA / 27 SpD / 7 Spe  
+- Stone Edge  
+- Swagger  
+- Self-Destruct  
+- Harden

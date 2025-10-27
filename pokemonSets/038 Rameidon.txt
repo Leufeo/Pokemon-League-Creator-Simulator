@@ -1,0 +1,10 @@
+Rameidon (Rampardos) @ Absorb Bulb  
+Ability: Mold Breaker  
+Tera Type: Rock  
+EVs: 85 HP / 199 Atk / 118 SpD  
+Quirky Nature  
+IVs: 18 HP / 5 Atk / 17 Def / 25 SpA / 3 SpD / 3 Spe  
+- Focus Punch  
+- Ancient Power  
+- Flamethrower  
+- Smack Down

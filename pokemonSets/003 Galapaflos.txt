@@ -1,0 +1,9 @@
+003 Galapaflos (Tirtouga) @ Heavy-Duty Boots  
+Ability: Sturdy  
+Tera Type: Water  
+EVs: 147 Atk  
+Hardy Nature  
+IVs: 26 HP / 29 Atk / 21 Def / 28 SpA / 6 SpD / 10 Spe  
+- Crunch  
+- Liquidation  
+- Wide Guard

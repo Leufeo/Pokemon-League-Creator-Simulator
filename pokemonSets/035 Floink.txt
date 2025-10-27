@@ -1,0 +1,10 @@
+Floink (Tepig) @ Sticky Barb  
+Ability: Blaze  
+Tera Type: Fire  
+EVs: 77 HP / 91 SpA / 232 SpD / 108 Spe  
+Careful Nature  
+IVs: 13 HP / 10 Def / 24 SpA / 2 SpD / 27 Spe  
+- Fire Spin  
+- Wild Charge  
+- Rock Tomb  
+- Tackle

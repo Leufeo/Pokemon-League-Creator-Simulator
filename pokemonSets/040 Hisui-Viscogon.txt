@@ -1,0 +1,10 @@
+Hisui-Viscogon (Goodra-Hisui)
+Ability: Shell Armor  
+Tera Type: Steel  
+EVs: 119 SpA / 161 Spe  
+Bold Nature  
+IVs: 27 HP / 1 Atk / 2 Def / 3 SpA / 19 SpD / 20 Spe  
+- Iron Head  
+- Weather Ball  
+- Body Press  
+- Charm

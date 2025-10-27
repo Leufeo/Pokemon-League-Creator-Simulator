@@ -1,0 +1,11 @@
+024 Hisui-Arktilas (Avalugg-Hisui)  
+Ability: Ice Body  
+Shiny: Yes  
+Tera Type: Ice  
+EVs: 1 Def / 6 SpA / 185 SpD  
+Docile Nature  
+IVs: 23 HP / 26 Atk / 28 Def / 16 SpA / 22 SpD / 26 Spe  
+- Tera Blast  
+- Heavy Slam  
+- Rock Slide  
+- Blizzard

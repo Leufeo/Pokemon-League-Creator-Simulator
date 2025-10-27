@@ -1,0 +1,10 @@
+019 Tangela (Tangela)  
+Ability: Chlorophyll  
+Tera Type: Grass  
+EVs: 209 Atk  
+Timid Nature  
+IVs: 3 HP / 14 Atk / 23 Def / 19 SpA / 20 Spe  
+- Vine Whip  
+- Power Swap  
+- Bullet Seed  
+- Reflect

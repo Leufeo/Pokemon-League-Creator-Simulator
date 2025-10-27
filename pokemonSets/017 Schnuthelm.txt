@@ -1,0 +1,10 @@
+017 Schnuthelm (Shelmet)  
+Ability: Shell Armor  
+Tera Type: Bug  
+EVs: 34 Atk / 136 SpA / 89 Spe  
+Mild Nature  
+IVs: 28 HP / 29 Atk / 28 Def / 30 SpA / 6 SpD  
+- Acid Armor  
+- Substitute  
+- Bug Buzz  
+- Toxic Spikes

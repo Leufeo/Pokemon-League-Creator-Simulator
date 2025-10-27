@@ -1,0 +1,11 @@
+012 Lumiflora (Glimmora)  
+Ability: Toxic Debris  
+Shiny: Yes  
+Tera Type: Rock  
+EVs: 21 Def / 224 SpA  
+Sassy Nature  
+IVs: 13 HP / 0 Atk / 1 Def / 5 SpD / 21 Spe  
+- Acid Spray  
+- Toxic  
+- Sludge Wave  
+- Light Screen

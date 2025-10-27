@@ -1,0 +1,11 @@
+014 Kryppuk (Spiritomb)  
+Ability: Infiltrator  
+Shiny: Yes  
+Tera Type: Ghost  
+EVs: 191 HP / 207 Atk / 67 Def / 6 SpA  
+Gentle Nature  
+IVs: 24 HP / 30 Atk / 26 SpA / 12 Spe  
+- Helping Hand  
+- Phantom Force  
+- Tera Blast  
+- Protect

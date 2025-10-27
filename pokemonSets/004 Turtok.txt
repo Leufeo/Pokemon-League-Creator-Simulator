@@ -1,0 +1,10 @@
+004 Turtok (Blastoise) @ Blastoisinite  
+Ability: Rain Dish  
+Tera Type: Water  
+EVs: 186 Atk  
+Hardy Nature  
+IVs: 11 HP / 16 Atk / 3 Def / 17 SpA / 18 SpD / 14 Spe  
+- Substitute  
+- Hyper Beam  
+- Fling  
+- Water Gun

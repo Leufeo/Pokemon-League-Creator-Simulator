@@ -1,0 +1,10 @@
+013 Seejong (Sealeo)
+Ability: Ice Body  
+Tera Type: Ice  
+EVs: 155 HP / 114 Def  
+Careful Nature  
+IVs: 28 HP / 24 Atk / 11 Def / 29 SpA / 29 SpD / 2 Spe  
+- Bulldoze  
+- Ice Beam  
+- Surf  
+- Endure

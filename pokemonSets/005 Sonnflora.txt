@@ -1,0 +1,10 @@
+005 Sonnflora (Sunflora) @ Mago Berry  
+Ability: Chlorophyll  
+Tera Type: Grass  
+EVs: 184 Def  
+Bashful Nature  
+IVs: 14 HP / 5 Atk / 12 Def / 13 SpA / 29 SpD / 8 Spe  
+- Giga Drain  
+- Sludge Bomb  
+- Sunny Day  
+- Tackle

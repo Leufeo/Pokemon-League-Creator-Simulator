@@ -1,0 +1,10 @@
+022 Golbit (Golett)  
+Ability: No Guard  
+Tera Type: Ground  
+EVs: 224 SpA  
+Jolly Nature  
+IVs: 3 HP / 26 Atk / 22 Def / 22 SpA / 29 SpD / 1 Spe  
+- Helping Hand  
+- Mud-Slap  
+- Poltergeist  
+- Focus Blast

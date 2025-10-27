@@ -1,0 +1,10 @@
+Terapagos (Terapagos-Terastal)  
+Ability: Tera Shell  
+Tera Type: Stellar  
+EVs: 168 SpD / 2 Spe  
+Relaxed Nature  
+IVs: 0 HP / 13 Atk / 9 Def / 6 SpA / 6 SpD / 6 Spe  
+- Roar  
+- Flamethrower  
+- Solar Beam  
+- Giga Impact
