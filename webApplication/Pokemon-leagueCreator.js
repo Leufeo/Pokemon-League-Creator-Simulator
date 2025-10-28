@@ -416,7 +416,7 @@ function load(event) {
         isDrawEnabled = data["draws"]
 
         countBattlesSimulated = data["simulated"]
-        if (countBattlesSimulated != undefined) {
+        if (countBattlesSimulated != undefined && countBattlesSimulated < data["schedule"].length) {
             schedule.children[1].children[Math.floor(countBattlesSimulated / (schedule.children[1].children[0].children.length - 1))].children[countBattlesSimulated % (schedule.children[1].children[0].children.length - 1) + 1].children.push(component.create('button', {}, "Simulate", []).addEventListener('click', simulateBattle))
         }
 
