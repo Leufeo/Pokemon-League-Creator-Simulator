@@ -25,8 +25,8 @@ exp.post("/sim/1v1", function (request, result) {
 
     stream.write(`>start {"formatid":"custombattle"}`) 
 
-    function player(number, playerName, teamExport) {
-        stream.write(`>player p${number} ${JSON.stringify({name:playerName, team:Teams.pack(Teams.import(teamExport))})}`) 
+    function player(number, name, teamExport) {
+        stream.write(`>player p${number} ${JSON.stringify({"name": name, "team": Teams.pack(Teams.import(teamExport))})}`) 
     }
 
     const sets = []
@@ -45,8 +45,27 @@ exp.post("/sim/1v1", function (request, result) {
         z.push(title.charAt(title.length - 1) == "Z")
     }
 
-    playerFromTxt(1, "left", "./pokemonSets/" + request["body"]["left"] + ".txt")
-    playerFromTxt(2, "right", "./pokemonSets/" + request["body"]["right"] + ".txt")
+    function initializePlayer(number, pokemonName) {
+        try {
+            playerFromTxt(number, "left", "./pokemonSets/" + pokemonName + ".txt")
+        } catch (exception) {
+            if (exception.code == 'ENOENT') {
+                console.log("1v1: ENOENT: File named", pokemonName + ".txt", "does not exist")
+            }
+            else {
+                console.log("1v1: Error at initializing player:", exception.code)
+            }
+            throw exception
+        }
+    }
+
+    try {
+        initializePlayer(1, request["body"]["left"])
+        initializePlayer(2, request["body"]["right"])
+    } catch {
+        stream._destroy()
+        return
+    }
 
     for (let i = 0;  i < 200;  i++) {
         let choice = Math.floor(Math.random() * 4) + 1
@@ -77,7 +96,7 @@ exp.post("/sim/1v1", function (request, result) {
     }
 })
 
-function getMoveFromSet(set, moveNumber) {
+function getMoveFromSet(set, moveNumber) { // reimplementation to use stream attributes recommended
     let i = 0
     for (let j = 0; j < moveNumber; j++) {
         i = set.indexOf("- ", i + 1)
