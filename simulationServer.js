@@ -45,9 +45,9 @@ exp.post("/sim/1v1", function (request, result) {
         z.push(title.charAt(title.length - 1) == "Z")
     }
 
-    function initializePlayer(number, pokemonName) {
+    function initializePlayer(number, playerName, pokemonName) {
         try {
-            playerFromTxt(number, "left", "./pokemonSets/" + pokemonName + ".txt")
+            playerFromTxt(number, playerName, "./pokemonSets/" + pokemonName + ".txt")
         } catch (exception) {
             if (exception.code == 'ENOENT') {
                 console.log("1v1: ENOENT: File named", pokemonName + ".txt", "does not exist")
@@ -60,8 +60,8 @@ exp.post("/sim/1v1", function (request, result) {
     }
 
     try {
-        initializePlayer(1, request["body"]["left"])
-        initializePlayer(2, request["body"]["right"])
+        initializePlayer(1, "left", request["body"]["left"])
+        initializePlayer(2, "right", request["body"]["right"])
     } catch {
         stream._destroy()
         return
