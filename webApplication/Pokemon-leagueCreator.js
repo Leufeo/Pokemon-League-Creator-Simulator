@@ -584,33 +584,51 @@ function winnerName(report, rowMatchSchedule) {
 
 function leftHP(name, battle) {
     let i = battle.length - 2
-    while (!(wasAttacked(battle[i], name) || wasHealed(battle[i], name)) && i > 0) {
+    while (damaged(battle[i], name) == -1 && healed(battle[i], name) == -1 && i > 0) {
         i--
     }
-    console.log("i", i)
     if (i == 0) {
         return 100
     }
-    if (battle[i].lastIndexOf("-damage") > battle[i].lastIndexOf("-heal")) {
-        return numberStartingAt(battle[i], battle[i].lastIndexOf("-damage") + 14 + name.length)
+    const damagedAt = damaged(battle[i], name)
+    const healedAt = healed(battle[i], name)
+    if (damagedAt > healedAt) {
+        return numberStartingAt(battle[i], damagedAt + 14 + name.length)
     }
-    return numberStartingAt(battle[i], battle[i].lastIndexOf("-heal") + 12 + name.length)
+    return numberStartingAt(battle[i], healedAt + 12 + name.length)
 }
 
-function wasAttacked(str, name) {
-    return str.lastIndexOf("-damage") > -1 && str.indexOf(name, str.indexOf("-damage") + 7) > -1 && str.indexOf(name, str.lastIndexOf("-damage") + 7) < str.indexOf("100", str.lastIndexOf("-damage") + 7)
+function damaged(str, name) {
+    let i = str.indexOf("-damage")
+    let damagedAt = -1
+    while (i > -1) {
+        if (str.indexOf(name, i + 7) > -1 && str.indexOf("/100", i + 7) > str.indexOf(name, i + 7)) {
+            damagedAt = i
+        }
+        i = str.indexOf("-damage", i + 7)
+    }
+    return damagedAt
 }
 
-function wasHealed(str, name) {
-    return str.lastIndexOf("-heal") > -1 && str.indexOf(name, str.indexOf("-heal") + 5) > -1 && str.indexOf(name, str.lastIndexOf("-heal") + 5) < str.indexOf("100", str.lastIndexOf("-heal") + 5)
+function healed(str, name) {
+    let i = str.indexOf("-heal")
+    let healedAt = -1
+    while (i > -1) {
+        if (str.indexOf(name, i + 5) > -1 && str.indexOf("/100", i + 5) > str.indexOf(name, i + 5)) {
+            healedAt = i
+        }
+        i = str.indexOf("-heal", i + 5)
+    }
+    return healedAt
 }
 
 function numberStartingAt(string, i) {
     let digits = 0
-    // console.log("["+string.charAt(i)+"]")
     while (string.charCodeAt(i + digits) > 47 && string.charCodeAt(i + digits) < 58) {
         digits++
     }
-    // console.log(digits + ":", string.slice(i, i + digits))
+    if (digits == 0) {
+        console.log("Failed reading number from index", i, "in", + '"' + string + '"')
+    }
     return string.slice(i, i + digits)
 }
