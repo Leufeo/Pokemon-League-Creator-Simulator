@@ -13,18 +13,10 @@ const fs = require('fs')
 const setDir = "./pokemonSets/"
 
 exp.post("/sim/1v1", function (request, result) {
-    const stream = new Sim.BattleStream() 
+    const stream = new Sim.BattleStream()
+    readStream(stream, result);
 
-    const battle = [];
-    (async () => {
-        for await (const output of stream) {
-            battle.push(output)
-            console.log(output)
-        }
-        result.send(battle)
-    })() 
-
-    stream.write(`>start {"formatid":"custombattle"}`) 
+    stream.write(`>start {"formatid":"custombattle"}`)
 
     let properties = {}
     try {
@@ -42,35 +34,19 @@ exp.post("/sim/1v1", function (request, result) {
     }
 
     for (let i = 0;  i < 200;  i++) {
-        let choice = Math.floor(Math.random() * 4) + 1
-        let setProperties = properties["left"][request["body"]["left"]]
-        if (setProperties["mega"] && Math.random() < 0.5) {
-            stream.write(`>p1 move ${choice} mega`)
-            setProperties["mega"][0] = false
-        }
-        else if (setProperties["z"] && Math.random() < 0.5 && getMoveFromSet(sets[0], choice).type == zCristalType[titles[0].slice(titles[0].indexOf("@") + 2)]) {
-            stream.write(`>p1 move ${choice} zmove`)
-            setProperties["z"] = false
-        }
-        else {
-            stream.write(`>p1 move ${choice}`)
-        }
-
-        choice = Math.floor(Math.random() * 4) + 1
-        setProperties = properties["left"][request["body"]["left"]]
-        if (setProperties["mega"] && Math.random() < 0.5) {
-            stream.write(`>p2 move ${choice} mega`)
-            setProperties["mega"] = false
-        }
-        else if (setProperties["z"] && Math.random() < 0.5 && getMoveFromSet(sets[1], choice).type == zCristalType[titles[1].slice(titles[0].indexOf("@") + 2)]) {
-            stream.write(`>p2 move ${choice} zmove`)
-            setProperties["z"] = false
-        }
-        else {
-            stream.write(`>p2 move ${choice}`)
-        }
+        moveChoice(stream, 1, properties["left"][Object.keys(properties["left"])[0]])
+        moveChoice(stream, 2, properties["right"][Object.keys(properties["right"])[0]])
     }
 })
+
+async function readStream(stream, resultVariable) {
+    const battle = []
+    for await (const output of stream) {
+        battle.push(output)
+        console.log(output)
+    }
+    resultVariable.send(battle)
+}
 
 function addPlayers(stream, names, sources) {
     const properties = {}
@@ -95,6 +71,22 @@ function addPlayer(stream, number, name, sources) {
         delete properties[p["title"]]["title"]
     }
     return properties
+}
+
+function moveChoice(stream, playerNumber, setProperties) {
+    const choice = Math.floor(Math.random() * 4) + 1
+    if (setProperties["mega"] && Math.random() < 0.5) {
+        stream.write(`>p${playerNumber} move ${choice} mega`)
+        setProperties["mega"] = false
+    }
+    else if (setProperties["z"] && Math.random() < 0.5 && setProperties["moves"][choice - 1].type == zCristalType[setProperties["item"]]) {
+        stream.write(`>p${playerNumber} move ${choice} zmove`)
+        setProperties["z"] = false
+    }
+    else {
+        stream.write(`>p${playerNumber} move ${choice}`)
+    }
+
 }
 
 function readSets(sources) {
@@ -128,6 +120,10 @@ function mergeSets(sets) {
 function getProperties(set) {
     const properties = {}
     properties["title"] = removeLastSpaces(set.slice(0, set.indexOf("\n") - 1))
+    if (properties["title"].indexOf("@") > -1) {
+        properties["item"] = properties["title"].slice(properties["title"].indexOf("@") + 2)
+    }
+    properties["moves"] = [getMoveFromSet(set, 1), getMoveFromSet(set, 2), getMoveFromSet(set, 3), getMoveFromSet(set, 4)]
     properties["mega"] = properties["title"].slice(properties["title"].length - 4).indexOf("te") > -1
     properties["z"] = properties["title"].charAt(properties["title"].length - 1) == "Z"
     if (properties["title"].indexOf(" (") > -1) {
