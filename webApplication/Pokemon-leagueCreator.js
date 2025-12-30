@@ -628,7 +628,7 @@ function numberStartingAt(string, i) {
         digits++
     }
     if (digits == 0) {
-        console.log("Failed reading number from index", i, "in", + '"' + string + '"')
+        console.log("Failed reading number from index", i, "in", '"' + string + '"')
     }
     return string.slice(i, i + digits)
 }
