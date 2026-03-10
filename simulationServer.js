@@ -18,7 +18,7 @@ exp.post("/sim/1v1", function (request, result) {
 
     stream.write(`>start {"formatid":"custombattle"}`)
 
-    let properties = {}
+    let properties = undefined
     try {
         properties = addPlayers(stream, ["left", "right"], [[setDir + request["body"]["left"] + ".txt"], [setDir + request["body"]["right"] + ".txt"]])
         for (let player in properties) {
@@ -48,7 +48,7 @@ exp.post("/sim/2v2", function (request, result) {
 
     stream.write(`>start {"formatid":"[Gen 9] Doubles Custom Game"}`)
 
-    let properties = {}
+    let properties = undefined
     try {
         properties = addPlayers(stream, ["left", "right"], [pathsTo(request["body"]["left"]), pathsTo(request["body"]["right"])])
         for (let player in properties) {
@@ -141,8 +141,13 @@ function playerMoveChoicesDoubles(stream, playerNumber, sideProperties) {
 function getMoveChoiceStringDoubles(setProperties, pokemonStatus) {
     const choice = Math.floor(Math.random() * setProperties["moves"].length) + 1
     let choiceString = "move " + choice
-    if (setProperties["moves"][choice - 1].target == 'normal' && !Object.keys(pokemonStatus.volatiles).includes('mustrecharge')) { // compatibility with special cases like pokemon shapeshifting needs to be tested
-        choiceString += " " + (Math.floor(Math.random() * 2) + 1)
+    if (!(Object.keys(pokemonStatus.volatiles).includes('mustrecharge') || Object.keys(pokemonStatus.volatiles).includes('twoturnmove'))) { // compatibility with special cases like pokemon shapeshifting needs to be tested
+        if (setProperties["moves"][choice - 1].target == 'normal' || (setProperties["moves"][choice - 1].target == 'any' && (Dex.moves.get(pokemonStatus.moveSlots[choice - 1].move).category == 'Physical' || Dex.moves.get(pokemonStatus.moveSlots[choice - 1].move).category == 'Special'))) {
+            choiceString += " " + (Math.floor(Math.random() * 2) + 1)
+        }
+        else if (setProperties["moves"][choice - 1].target == 'any') {
+            choiceString += " " + (Math.floor(Math.random() * 3) + 1)
+        }
     }
 
     if (setProperties["mega"] && Math.random() < 0.5) {
