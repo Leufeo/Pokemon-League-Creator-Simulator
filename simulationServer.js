@@ -18,15 +18,8 @@ exp.post("/sim/1v1", function (request, result) {
 
     stream.write(`>start {"formatid":"custombattle"}`)
 
-    let properties = undefined
     try {
-        properties = addPlayers(stream, ["left", "right"], [[setDir + request["body"]["left"] + ".txt"], [setDir + request["body"]["right"] + ".txt"]])
-        for (let player in properties) {
-            if (Object.keys(properties[player]).length == 0) {
-                console.log("No sets found for player " + player)
-                throw new Error("No sets found for player " + player)
-            }
-        }
+        addPlayers(stream, ["left", "right"], [[setDir + request["body"]["left"] + ".txt"], [setDir + request["body"]["right"] + ".txt"]])
     } catch {
         console.log("1v1: Player initialization failed")
         stream._destroy()
@@ -37,8 +30,8 @@ exp.post("/sim/1v1", function (request, result) {
     stream.write(">p2 team 1")
 
     for (let i = 0;  i < 200;  i++) {
-        moveChoiceSingles(stream, 1, properties["left"][Object.keys(properties["left"])[0]])
-        moveChoiceSingles(stream, 2, properties["right"][Object.keys(properties["right"])[0]])
+        moveChoiceSingles(stream, 1, stream.battle.sides[0].active[0])
+        moveChoiceSingles(stream, 2, stream.battle.sides[1].active[0])
     }
 })
 
@@ -48,15 +41,8 @@ exp.post("/sim/2v2", function (request, result) {
 
     stream.write(`>start {"formatid":"[Gen 9] Doubles Custom Game"}`)
 
-    let properties = undefined
     try {
-        properties = addPlayers(stream, ["left", "right"], [pathsTo(request["body"]["left"]), pathsTo(request["body"]["right"])])
-        for (let player in properties) {
-            if (Object.keys(properties[player]).length == 0) {
-                console.log("No sets found for player " + player)
-                throw new Error("No sets found for player " + player)
-            }
-        }
+        addPlayers(stream, ["left", "right"], [pathsTo(request["body"]["left"]), pathsTo(request["body"]["right"])])
     } catch {
         console.log("2v2: Player initialization failed")
         stream._destroy()
@@ -69,8 +55,8 @@ exp.post("/sim/2v2", function (request, result) {
     stream.write(`>p2 team ${lead}${lead % 2 + 1}`)
 
     for (let i = 0;  i < 200;  i++) {
-        playerMoveChoicesDoubles(stream, 1, properties["left"])
-        playerMoveChoicesDoubles(stream, 2, properties["right"])
+        playerMoveChoicesDoubles(stream, 1, stream.battle.sides[0])
+        playerMoveChoicesDoubles(stream, 2, stream.battle.sides[1])
     }
 })
 
@@ -84,13 +70,11 @@ async function readStream(stream, resultVariable) {
 }
 
 function addPlayers(stream, names, sources) {
-    const properties = {}
     let i = 1
     for (let name of names) {
-        properties[name] = addPlayer(stream, i, name, sources[i - 1])
+        addPlayer(stream, i, name, sources[i - 1])
         i += 1
     }
-    return properties
 }
 
 function addPlayer(stream, number, name, sources) {
@@ -98,68 +82,75 @@ function addPlayer(stream, number, name, sources) {
     if (sets.length > 0) {
         stream.write(`>player p${number} ${JSON.stringify({"name": name, "team": Teams.pack(Teams.import(mergeSets(sets)))})}`)
     }
-    
-    const properties = {}
-    for (let set of sets) {
-        p = getProperties(set)
-        properties[p["title"]] = p
-        delete properties[p["title"]]["title"]
-    }
-    return properties
 }
 
-function moveChoiceSingles(stream, playerNumber, setProperties) {
-    const choice = Math.floor(Math.random() * setProperties["moves"].length) + 1
-    if (setProperties["mega"] && Math.random() < 0.5) {
+function moveChoiceSingles(stream, playerNumber, pokemonStatus) {
+    const choice = getMoveChoice(pokemonStatus)
+    if (typeof(pokemonStatus.canMegaEvo) == 'string' && Math.random() < 0.5) {
         stream.write(`>p${playerNumber} move ${choice} mega`)
-        setProperties["mega"] = false
     }
-    else if (setProperties["z"] && Math.random() < 0.5 && setProperties["moves"][choice - 1].type == zCristalType[setProperties["item"]]) {
+    else if (Math.random() < 0.5 && Dex.moves.get(pokemonStatus.moveSlots[choice - 1].move).type == zCristalType[pokemonStatus.item]) {
         stream.write(`>p${playerNumber} move ${choice} zmove`)
-        setProperties["z"] = false
     }
     else {
         stream.write(`>p${playerNumber} move ${choice}`)
     }
-
 }
 
-function playerMoveChoicesDoubles(stream, playerNumber, sideProperties) {
-    const pokemon1 = stream.battle.sides[playerNumber - 1].active[0]
-    const pokemon2 = stream.battle.sides[playerNumber - 1].active[1]
-    if (stream.battle.sides[playerNumber - 1].pokemonLeft == 2) {
-        stream.write(`>p${playerNumber} ${getMoveChoiceStringDoubles(sideProperties[pokemon1.name], pokemon1)}, ${getMoveChoiceStringDoubles(sideProperties[pokemon2.name], pokemon2)}`)
+function playerMoveChoicesDoubles(stream, playerNumber, sideStatus) {
+    const pokemon1 = sideStatus.active[0]
+    const pokemon2 = sideStatus.active[1]
+    if (sideStatus.pokemonLeft == 2) {
+        stream.write(`>p${playerNumber} ${getMoveChoiceStringDoubles(pokemon1)}, ${getMoveChoiceStringDoubles(pokemon2)}`)
     }
-    else if (stream.battle.sides[playerNumber - 1].active[0].hp > 0){
-        stream.write(`>p${playerNumber} ${getMoveChoiceStringDoubles(sideProperties[pokemon1.name], pokemon1)}`)
+    else if (pokemon1.hp > 0){
+        stream.write(`>p${playerNumber} ${getMoveChoiceStringDoubles(pokemon1)}`)
     }
-    else if (stream.battle.sides[playerNumber - 1].active[1].hp > 0){
-        stream.write(`>p${playerNumber} ${getMoveChoiceStringDoubles(sideProperties[pokemon2.name], pokemon2)}`)
+    else if (pokemon2.hp > 0){
+        stream.write(`>p${playerNumber} ${getMoveChoiceStringDoubles(pokemon2)}`)
     }
 }
 
-function getMoveChoiceStringDoubles(setProperties, pokemonStatus) {
-    const choice = Math.floor(Math.random() * setProperties["moves"].length) + 1
+function getMoveChoiceStringDoubles(pokemonStatus) {
+    const choice = getMoveChoice(pokemonStatus)
     let choiceString = "move " + choice
-    if (!(Object.keys(pokemonStatus.volatiles).includes('mustrecharge') || Object.keys(pokemonStatus.volatiles).includes('twoturnmove'))) { // compatibility with special cases like pokemon shapeshifting needs to be tested
-        if (setProperties["moves"][choice - 1].target == 'normal' || (setProperties["moves"][choice - 1].target == 'any' && (Dex.moves.get(pokemonStatus.moveSlots[choice - 1].move).category == 'Physical' || Dex.moves.get(pokemonStatus.moveSlots[choice - 1].move).category == 'Special'))) {
+
+    if (canChooseMove(pokemonStatus)) {
+        if (pokemonStatus.moveSlots[choice - 1].target == 'normal' || (pokemonStatus.moveSlots[choice - 1].target == 'any' && (Dex.moves.get(pokemonStatus.moveSlots[choice - 1].move).category == 'Physical' || Dex.moves.get(pokemonStatus.moveSlots[choice - 1].move).category == 'Special'))) {
             choiceString += " " + (Math.floor(Math.random() * 2) + 1)
         }
-        else if (setProperties["moves"][choice - 1].target == 'any') {
+        else if (pokemonStatus.moveSlots[choice - 1].target == 'any') {
             choiceString += " " + (Math.floor(Math.random() * 3) + 1)
         }
     }
 
-    if (setProperties["mega"] && Math.random() < 0.5) {
+    if (typeof(pokemonStatus.canMegaEvo) == 'string' && Math.random() < 0.5) {
         choiceString += " mega"
-        setProperties["mega"] = false
     }
-    else if (setProperties["z"] && Math.random() < 0.5 && setProperties["moves"][choice - 1].type == zCristalType[setProperties["item"]]) {
+    else if (Math.random() < 0.5 && Dex.moves.get(pokemonStatus.moveSlots[choice - 1].move).type == zCristalType[pokemonStatus.item]) {
         choiceString += " zmove"
-        setProperties["z"] = false
     }
 
     return choiceString
+}
+
+function getMoveChoice(pokemonStatus) {
+    if (canChooseMove(pokemonStatus)) {
+        const availableMoves = []
+        for (let move in pokemonStatus.moveSlots) {
+            if (!pokemonStatus.moveSlots[move].disabled) {
+                availableMoves.push(move)
+            }
+        }
+        return Number(availableMoves[Math.floor(Math.random() * availableMoves.length)]) + 1
+    }
+    else {
+        return 1
+    }
+}
+
+function canChooseMove(pokemonStatus) {
+    return !(Object.keys(pokemonStatus.volatiles).includes('mustrecharge') || Object.keys(pokemonStatus.volatiles).includes('twoturnmove'))
 }
 
 function readSets(sources) {
@@ -190,54 +181,6 @@ function mergeSets(sets) {
     return team
 }
 
-function getProperties(set) {
-    const properties = {}
-
-    properties["title"] = removeLastSpaces(set.slice(0, set.indexOf("\n") - 1))
-    if (properties["title"].indexOf("@") > -1) {
-        properties["item"] = properties["title"].slice(properties["title"].indexOf("@") + 2)
-    }
-
-    properties["moves"] = []
-    for (let i = 1; i <= set.match(new RegExp("\n- ", 'g')).length; i++) {
-        properties["moves"].push(getMoveFromSet(set, i))
-    }
-
-    properties["mega"] = properties["title"].slice(properties["title"].length - 4).indexOf("te") > -1
-    properties["z"] = properties["title"].charAt(properties["title"].length - 1) == "Z"
-
-    if (properties["title"].indexOf(" (") > -1) {
-        properties["title"] = properties["title"].slice(0, properties["title"].indexOf(" ("))
-    }
-    else if (properties["title"].indexOf(" @") > -1) {
-        properties["title"] = properties["title"].slice(0, properties["title"].indexOf(" @"))
-    }
-    else {
-        properties["title"] = removeLastSpaces(properties["title"])
-    }
-    return properties
-}
-
-function getMoveFromSet(set, moveNumber) { // reimplementation to use stream attributes recommended
-    let i = 0
-    for (let j = 0; j < moveNumber; j++) {
-        i = set.indexOf("- ", i + 1)
-    }
-    if (set.indexOf("\n", i) == -1) {
-        return Dex.moves.get(set.slice(i + 2))
-    }
-    return Dex.moves.get(set.slice(i + 2, set.indexOf("\n", i)))
-}
-
-function removeLastSpaces(str) {
-    let i = 1
-    console.log(str.charAt(str.length - i))
-    while (str.charAt(str.length - i) == " " || str.charAt(str.length - i) == "\n") {
-        i++
-    }
-    return str.slice(0, str.length - i + 1)
-}
-
 function pathsTo(setNames) {
     const paths = []
     for (name of setNames) {
@@ -247,24 +190,24 @@ function pathsTo(setNames) {
 }
 
 const zCristalType = {
-    "Buginium Z": "Bug",
-    "Darkinium Z": "Dark",
-    "Dragonium Z": "Dragon",
-    "Electrium Z": "Electric",
-    "Fairium Z": "Fairy",
-    "Fightinium Z": "Fighting",
-    "Firium Z": "Fire",
-    "Flyinium Z": "Flying",
-    "Ghostium Z": "Ghost",
-    "Grassium Z": "Grass",
-    "Groundium Z": "Ground",
-    "Icium Z": "Ice",
-    "Normalium Z": "Normal",
-    "Poisonium Z": "Poison",
-    "Psychium Z": "Psychic",
-    "Rockium Z": "Rock",
-    "Steelium Z": "Steel",
-    "Waterium Z": "Water"
+    "buginiumz": "Bug",
+    "darkiniumz": "Dark",
+    "dragoniumz": "Dragon",
+    "electriumz": "Electric",
+    "fairiumz": "Fairy",
+    "fightiniumz": "Fighting",
+    "firiumz": "Fire",
+    "flyiniumz": "Flying",
+    "ghostiumz": "Ghost",
+    "grassiumz": "Grass",
+    "groundiumz": "Ground",
+    "iciumz": "Ice",
+    "normaliumz": "Normal",
+    "poisoniumz": "Poison",
+    "psychiumz": "Psychic",
+    "rockiumz": "Rock",
+    "steeliumz": "Steel",
+    "wateriumz": "Water"
 }
 
 exp.listen(3000, () => console.log("🚀 server is running at http://localhost:3000"))
