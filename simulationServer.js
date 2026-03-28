@@ -61,12 +61,10 @@ exp.post("/sim/2v2", function (request, result) {
 })
 
 async function readStream(stream, resultVariable) {
-    const battle = []
     for await (const output of stream) {
-        battle.push(output)
         console.log(output)
     }
-    resultVariable.send(battle)
+    resultVariable.send(stream.battle)
 }
 
 function addPlayers(stream, names, sources) {

@@ -1,5 +1,6 @@
 let participants = []
 let isDrawEnabled = false
+let simulationMode = "none"
 
 let main = document.querySelector('main')
 
@@ -12,29 +13,38 @@ const table = component.create('div', {}, "", [
             component.create('th', {}, "Left HP", []),
             component.create('th', {}, "Wins", [])
         ]),
+    ]),
+    component.create('input', {}, "", []).addEventListener('keypress', function(event) {
+        if (event.key == "Enter") {
+            newParticipant()
+        }
+    }),
+    component.create('button', {}, "Add", []).addEventListener('click', newParticipant),
+    component.create('p', {}, "", [
+        component.create('button', {}, "Confirm lineup", []).addEventListener('click', generateSchedule),
+        component.create('input', {'type': "file"}, "", []).addEventListener('change', load)
+    ]),
+    component.create('p', {}, "Simulation: ", [
+        component.create('select', {}, "", [
+            component.create('option', {}, "none", []),
+            component.create('option', {}, "1v1", []),
+            component.create('option', {}, "2v2", [])
+        ]).addEventListener('change', function(event) {
+            simulationMode = event.target.value
+        })
     ])
 ])
 main.appendChild(render(table))
-const input = document.createElement('input')
-input.addEventListener('keypress', function(event) {
-    if (event.key == "Enter") {
-        newParticipant()
-    }
-})
-main.appendChild(input)
-main.appendChild(render(component.create('button', {}, "Add", []).addEventListener('click', newParticipant)))
-main.appendChild(render(component.create('button', {}, "Confirm lineup", []).addEventListener('click', generateSchedule)))
-main.appendChild(render(component.create('input', {'type': "file"}, "", []).addEventListener('change', load)))
 
 function newParticipant() {
-    participants.push({"name": input.value, "wins": 0, "draws": 0, "HP": 0})
+    participants.push({"name": table.children[2].domRef.value, "wins": 0, "draws": 0, "HP": 0})
     table.children[1].children.push(component.create('tr', {}, "", [
         component.create('th', {}, table.children[1].children.length + ".", []),
-        component.create('th', {}, input.value, []),
+        component.create('th', {}, table.children[2].domRef.value, []),
         component.create('th', {}, "0%", []),
         component.create('th', {}, 0, [])
     ]))
-    input.value = ""
+    table.children[2].domRef.value = ""
     table.children[1].domRef.appendChild(render(table.children[1].children[table.children[1].children.length - 1]))
 }
 
@@ -104,7 +114,9 @@ function generateSchedule() {
 
         schedule.children[1].children.sort(function() {return 0.5 - Math.random()})
 
-        schedule.children[1].children[0].children[0].children.push(component.create('button', {}, "Simulate", []).addEventListener('click', simulateBattle))
+        if (simulationMode != "none") {
+            schedule.children[1].children[0].children[0].children.push(component.create('button', {}, "Simulate", []).addEventListener('click', simulateBattle))
+        }
 
         for (let i = 0; i < participantCount - 1; i++) {
             schedule.children[1].children[i].children = [component.create('h3', {}, "Matchday " + (i + 1), [
@@ -122,14 +134,12 @@ function renderSchedule() {
         component.create('input', {'type': "file"}, "", []).addEventListener('change', load)
     )
 
+    table.children.splice(2)
     table.children.push(
         component.create('div', {}, "", [
             component.create('button', {}, "colourSettings", []).addEventListener('click', colourSettings)
         ])
     )
-    if (table.children.length > 3) {
-        table.children.splice(3)
-    }
 
     main.parentElement.appendChild(render(component.create('main', {'id': "main"}, "", [schedule, table])))
     main.remove()
@@ -348,7 +358,7 @@ function save() {
 }
 
 function saveJson() {
-    const json = {"schedule": [], "draws": false, "simulated": countBattlesSimulated, "colourSettings": {"winner": winner, "relegatedUp": relegatedUp, "relegatedDown": relegatedDown, "relegatedDown2": relegatedDown2}}
+    const json = {"schedule": [], "draws": false, "simulation": simulationMode, "simulated": countBattlesSimulated, "colourSettings": {"winner": winner, "relegatedUp": relegatedUp, "relegatedDown": relegatedDown, "relegatedDown2": relegatedDown2}}
 
     if (schedule.children[0].children[0].type == 'button') {
         json["name"] = name
@@ -415,8 +425,9 @@ function load(event) {
 
         isDrawEnabled = data["draws"]
 
+        simulationMode = data["simulation"]
         countBattlesSimulated = data["simulated"]
-        if (countBattlesSimulated != undefined && countBattlesSimulated / (schedule.children[1].children[0].children.length - 1) < data["schedule"].length) {
+        if (simulationMode != "none" && countBattlesSimulated != undefined && countBattlesSimulated / (schedule.children[1].children[0].children.length - 1) < data["schedule"].length) {
             schedule.children[1].children[Math.floor(countBattlesSimulated / (schedule.children[1].children[0].children.length - 1))].children[countBattlesSimulated % (schedule.children[1].children[0].children.length - 1) + 1].children.push(component.create('button', {}, "Simulate", []).addEventListener('click', simulateBattle))
         }
 
@@ -454,7 +465,7 @@ function changeName() {
         }),
         component.create('button', {}, "Confirm", []).addEventListener('click', confirmName)
     ]
-    schedule.children[0].text = "schedule "
+    schedule.children[0].text = "Schedule "
     rerender(schedule.children[0], schedule.domRef, schedule.children[0].domRef)
 }
 
@@ -537,21 +548,11 @@ function colourTable() {
 let countBattlesSimulated = 0
 async function simulateBattle(event) {
     const row = event.currentTarget.parentNode
-    const results = await fetch("http://localhost:3000/sim/1v1", {
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            "left": row.children[1].textContent, 
-            "right": row.children[3].textContent
-        })
-    })
-    const battle = await results.json()
-    const report = JSON.parse(battle[battle.length - 1].slice(4))
-    console.log(battle)
+    const response = await battleRequest(row.children[1].textContent, row.children[3].textContent)
+    const results = await response.json()
+    console.log(results.log)
 
-    const winner = winnerName(report, row)
+    const winner = winnerName(results.winner, row)
     if (row.children[1].textContent == winner) {
         row.children[0].checked = true
         row.children[4].checked = false
@@ -562,73 +563,67 @@ async function simulateBattle(event) {
         row.children[4].checked = true
     }
     
-    row.children[5].value = leftHP(winner, battle)
-
-    row.children[7].remove()
+    if (results.winner == "left" && leftHP(results.sides[0].pokemon) > 0) {
+        row.children[5].value = leftHP(results.sides[0].pokemon)
+    }
+    else if (results.winner == "right" && leftHP(results.sides[1].pokemon) > 0) {
+        row.children[5].value = leftHP(results.sides[1].pokemon)
+    }
+    else {
+        row.children[0].checked = true
+        row.children[4].checked = true
+    }
+    
     changeTable(row)
-
+    row.children[7].remove()
     countBattlesSimulated++
     if (countBattlesSimulated < schedule.children[1].children.length * (schedule.children[1].children[0].children.length - 1)) {
         schedule.children[1].children[Math.floor(countBattlesSimulated / (schedule.children[1].children[0].children.length - 1))].children[countBattlesSimulated % (schedule.children[1].children[0].children.length - 1) + 1].domRef.appendChild(render(component.create('button', {}, "Simulate", []).addEventListener('click', simulateBattle)))
     }
 }
 
-function winnerName(report, rowMatchSchedule) {
-    if (report["winner"] == "left") {
+async function battleRequest(participant1, participant2) {
+    if (simulationMode == "1v1") { 
+        return await fetch("http://localhost:3000/sim/1v1", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "left": participant1, 
+                "right": participant2
+            })
+        })
+    }
+    if (simulationMode == "2v2") {
+        const seperationAtLeft = participant1.indexOf(" & ")
+        const seperationAtRight = participant2.indexOf(" & ")
+        return await fetch("http://localhost:3000/sim/2v2", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "left": [participant1.slice(0, seperationAtLeft), participant1.slice(seperationAtLeft + 3)], 
+                "right": [participant2.slice(0, seperationAtRight), participant2.slice(seperationAtRight + 3)]
+            })
+        })
+    }
+}
+
+function winnerName(winner, rowMatchSchedule) {
+    if (winner == "left") {
         return rowMatchSchedule.children[1].textContent
     }
-    if (report["winner"] == "right") {
+    if (winner == "right") {
         return rowMatchSchedule.children[3].textContent
     } 
 }
 
-function leftHP(name, battle) {
-    let i = battle.length - 2
-    while (damaged(battle[i], name) == -1 && healed(battle[i], name) == -1 && i > 0) {
-        i--
+function leftHP(sidePokemon) {
+    let left = 0
+    for (let pokemon of sidePokemon) {
+        left += Math.ceil(pokemon.hp / pokemon.maxhp * 100)
     }
-    if (i == 0) {
-        return 100
-    }
-    const damagedAt = damaged(battle[i], name)
-    const healedAt = healed(battle[i], name)
-    if (damagedAt > healedAt) {
-        return numberStartingAt(battle[i], damagedAt + 14 + name.length)
-    }
-    return numberStartingAt(battle[i], healedAt + 12 + name.length)
-}
-
-function damaged(str, name) {
-    let i = str.indexOf("-damage")
-    let damagedAt = -1
-    while (i > -1) {
-        if (str.indexOf(name, i + 7) > -1 && str.indexOf("/100", i + 7) > str.indexOf(name, i + 7)) {
-            damagedAt = i
-        }
-        i = str.indexOf("-damage", i + 7)
-    }
-    return damagedAt
-}
-
-function healed(str, name) {
-    let i = str.indexOf("-heal")
-    let healedAt = -1
-    while (i > -1) {
-        if (str.indexOf(name, i + 5) > -1 && str.indexOf("/100", i + 5) > str.indexOf(name, i + 5)) {
-            healedAt = i
-        }
-        i = str.indexOf("-heal", i + 5)
-    }
-    return healedAt
-}
-
-function numberStartingAt(string, i) {
-    let digits = 0
-    while (string.charCodeAt(i + digits) > 47 && string.charCodeAt(i + digits) < 58) {
-        digits++
-    }
-    if (digits == 0) {
-        console.log("Failed reading number from index", i, "in", '"' + string + '"')
-    }
-    return string.slice(i, i + digits)
+    return left
 }
