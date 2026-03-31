@@ -114,11 +114,19 @@ function getMoveChoiceStringDoubles(pokemonStatus) {
     let choiceString = "move " + choice
 
     if (canChooseMove(pokemonStatus)) {
-        if (pokemonStatus.moveSlots[choice - 1].target == 'normal' || (pokemonStatus.moveSlots[choice - 1].target == 'any' && (Dex.moves.get(pokemonStatus.moveSlots[choice - 1].move).category == 'Physical' || Dex.moves.get(pokemonStatus.moveSlots[choice - 1].move).category == 'Special'))) {
+        const chosenMove = pokemonStatus.moveSlots[choice - 1]
+        const allyAndFoePossibleTargets = chosenMove.target == 'any' || chosenMove.target == 'normal'
+        if (allyAndFoePossibleTargets && !Object.keys(normalTargetMovesWithPrefferedTarget).includes(chosenMove.move) || chosenMove.target == 'adjacentFoe') {
             choiceString += " " + (Math.floor(Math.random() * 2) + 1)
         }
-        else if (pokemonStatus.moveSlots[choice - 1].target == 'any') {
-            choiceString += " " + (Math.floor(Math.random() * 3) + 1)
+        else if (allyAndFoePossibleTargets && normalTargetMovesWithPrefferedTarget[chosenMove.move] == 'any') {
+            choiceString += " " + [1, 2, -((pokemonStatus.position + 1) % 2 + 1)][Math.floor(Math.random() * 3)]
+        }
+        else if (chosenMove.target == 'adjacentAlly' || (allyAndFoePossibleTargets && normalTargetMovesWithPrefferedTarget[chosenMove.move] == 'ally')) {
+            choiceString += " " + -((pokemonStatus.position + 1) % 2 + 1)
+        }
+        else if (chosenMove.target == 'adjacentAllyOrSelf') {
+            choiceString += " " + -(Math.floor(Math.random() * 2) + 1)
         }
     }
 
@@ -206,6 +214,18 @@ const zCristalType = {
     "rockiumz": "Rock",
     "steeliumz": "Steel",
     "wateriumz": "Water"
+}
+
+const normalTargetMovesWithPrefferedTarget = {
+    "After You": "ally",
+    "Spotlight": "any",
+    "Skill Swap": "any",
+    "Role Play": "any",
+    "Entrainment": "any",
+    "Simple Beam": "any",
+    "Worry Seed": "ally",
+    "Floral Healing": "ally",
+    "Heal Pulse": "ally"
 }
 
 exp.listen(3000, () => console.log("🚀 server is running at http://localhost:3000"))
